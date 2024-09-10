@@ -8,7 +8,8 @@ import ru.hogwarts.school.service.StudentService;
 
 import java.util.List;
 
-@RestController("students")
+@RestController()
+@RequestMapping("students")
 public class StudentController {
     private final StudentService studentService;
 
@@ -35,7 +36,7 @@ public class StudentController {
         }
     }
 
-    @PostMapping
+    @PostMapping()
     public ResponseEntity<Student> createStudent(@org.springframework.web.bind.annotation.RequestBody Student student) {
         try {
             return ResponseEntity.ok(studentService.createStudent(student));
@@ -55,7 +56,7 @@ public class StudentController {
         }
     }
 
-    @PutMapping
+    @PutMapping("")
     public ResponseEntity<Student> editStudent(@org.springframework.web.bind.annotation.RequestBody Student student) {
         try {
             return ResponseEntity.ok(studentService.editStudent(student));
