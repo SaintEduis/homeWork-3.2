@@ -5,7 +5,6 @@ import org.springframework.web.bind.annotation.*;
 import ru.hogwarts.school.exception.BadIdException;
 import ru.hogwarts.school.exception.FacultyAlreadyExistsException;
 import ru.hogwarts.school.exception.FacultyNotFoundException;
-import ru.hogwarts.school.exception.NoFacultiesOfThisColorException;
 import ru.hogwarts.school.model.Faculty;
 import ru.hogwarts.school.service.FacultyService;
 
@@ -18,16 +17,6 @@ public class FacultyController {
 
     public FacultyController(FacultyService facultyService) {
         this.facultyService = facultyService;
-    }
-
-    @GetMapping(path = "/filter{color}")
-    public ResponseEntity<List<Faculty>> getFacultiesByAge(@PathVariable String color) {
-        try {
-            return ResponseEntity.ok(facultyService.getFacultiesByColor(color));
-        }
-        catch (NoFacultiesOfThisColorException e) {
-            return ResponseEntity.notFound().build();
-        }
     }
 
     @GetMapping("{id}")
@@ -52,12 +41,8 @@ public class FacultyController {
 
     @DeleteMapping("{id}")
     public ResponseEntity<Faculty> deleteFaculty(@PathVariable long id) {
-        try {
-            return ResponseEntity.ok(facultyService.deleteFaculty(id));
-        }
-        catch (FacultyNotFoundException e) {
-            return ResponseEntity.notFound().build();
-        }
+        facultyService.deleteFaculty(id);
+        return ResponseEntity.ok().build();
     }
 
     @PutMapping
