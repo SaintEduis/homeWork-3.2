@@ -2,8 +2,11 @@ package ru.hogwarts.school.service;
 
 import org.springframework.stereotype.Service;
 import ru.hogwarts.school.exception.*;
+import ru.hogwarts.school.model.Faculty;
 import ru.hogwarts.school.model.Student;
 import ru.hogwarts.school.repositories.StudentRepository;
+
+import java.util.Collection;
 
 @Service
 public class StudentService {
@@ -28,10 +31,22 @@ public class StudentService {
     }
 
     public Student findStudent(long id) {
-        return studentRepository.findById(id).get();
+        return studentRepository.findById(id);
     }
 
     public void deleteStudent(long id) {
         studentRepository.deleteById(id);
+    }
+
+    public Collection<Student> findByAgeBetween(int min, int max) {
+        return studentRepository.findByAgeBetween(min, max);
+    }
+
+    public Collection<Student> getAllStudents() {
+        return studentRepository.findAll();
+    }
+
+    public Faculty findFaculty(long id) {
+        return studentRepository.findById(id).getFaculty();
     }
 }

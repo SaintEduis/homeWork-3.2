@@ -6,9 +6,11 @@ import ru.hogwarts.school.exception.BadIdException;
 import ru.hogwarts.school.exception.FacultyAlreadyExistsException;
 import ru.hogwarts.school.exception.FacultyNotFoundException;
 import ru.hogwarts.school.model.Faculty;
+import ru.hogwarts.school.model.Student;
 import ru.hogwarts.school.service.FacultyService;
 
 import java.util.List;
+import java.util.Set;
 
 @RestController()
 @RequestMapping("faculties")
@@ -27,6 +29,16 @@ public class FacultyController {
         catch (FacultyNotFoundException e) {
             return ResponseEntity.notFound().build();
         }
+    }
+
+    @GetMapping
+    public ResponseEntity<Faculty> getFaculty(@RequestParam String namePart, @RequestParam String colorPart) {
+        return ResponseEntity.ok(facultyService.findByNameContainsOrColorContainsIgnoreCase(namePart, colorPart));
+    }
+
+    @GetMapping("students/{id}")
+    public ResponseEntity<Set<Student>>  geStudentsOfFaculty(@PathVariable long id) {
+        return  ResponseEntity.ok(facultyService.findById(id));
     }
 
     @PostMapping
