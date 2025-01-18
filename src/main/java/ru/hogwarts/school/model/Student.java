@@ -22,7 +22,18 @@ public class Student {
         this.faculty = faculty;
     }
 
+    public Student(long id, String name, int age, Faculty faculty) {
+        this.id = id;
+        this.name = name;
+        this.age = age;
+        this.faculty = faculty;
+    }
+
     public Student() {}
+
+    public void setId(long id) {
+        this.id = id;
+    }
 
     public Long getId() {
         return id;

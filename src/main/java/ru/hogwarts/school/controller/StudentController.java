@@ -80,7 +80,7 @@ public class StudentController {
         }
 
         avatarService.uploadAvatar(id, avatar);
-        return  ResponseEntity.ok().build();
+        return ResponseEntity.ok().build();
     }
 
     @GetMapping(value = "/{id}/avatar")
