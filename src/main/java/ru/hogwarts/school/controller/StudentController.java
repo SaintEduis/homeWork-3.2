@@ -7,6 +7,7 @@ import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
+import org.springframework.web.servlet.mvc.method.annotation.StreamingResponseBody;
 import ru.hogwarts.school.exception.*;
 import ru.hogwarts.school.model.Avatar;
 import ru.hogwarts.school.model.Faculty;
@@ -20,6 +21,8 @@ import java.io.OutputStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.Collection;
+import java.util.zip.ZipEntry;
+import java.util.zip.ZipOutputStream;
 
 @RestController()
 @RequestMapping("students")
@@ -107,5 +110,57 @@ public class StudentController {
         headers.setContentLength(avatar.getPreview().length);
 
         return ResponseEntity.status(HttpStatus.OK).headers(headers).body(avatar.getPreview());
+    }
+
+    //Я не смог понять как выводить сразу несколько изображений в сваггер, поэтому сделал через zip-архив
+    @GetMapping(value = "/avatars")
+    public ResponseEntity<StreamingResponseBody> downloadAvatars(
+            @RequestParam Integer page,
+            @RequestParam Integer size
+    ) {
+        Collection<Avatar> avatars = avatarService.getAllAvatars(page, size);
+
+        StreamingResponseBody responseBody = outputStream -> {
+            try (ZipOutputStream zipOut = new ZipOutputStream(outputStream)) {
+                for (Avatar avatar : avatars) {
+                    Path path = Path.of(avatar.getFilePath());
+                    String fileName = path.getFileName().toString();
+                    try (InputStream inputStream = Files.newInputStream(path)) {
+                        ZipEntry zipEntry = new ZipEntry(fileName);
+                        zipOut.putNextEntry(zipEntry);
+                        inputStream.transferTo(zipOut);
+                        zipOut.closeEntry();
+                    }
+                }
+                zipOut.finish();
+            }
+        };
+
+        return ResponseEntity.ok()
+                .header(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_OCTET_STREAM_VALUE)
+                .header(
+                        HttpHeaders.CONTENT_DISPOSITION,
+                        "attachment; filename=\"avatars.zip\""
+                )
+                .body(responseBody);
+    }
+
+    @GetMapping(value = "/count")
+    public ResponseEntity<Integer> getCountOfStudents() {
+        try {
+            return ResponseEntity.ok(studentService.getCountOfStudents());
+        } catch (StudentNotFoundException e) {
+            return ResponseEntity.notFound().build();
+        }
+    }
+
+    @GetMapping(value = "/average")
+    public ResponseEntity<Integer> getStudentsAverageAge() {
+        return ResponseEntity.ok(studentService.getAverageOfStudentsAge());
+    }
+
+    @GetMapping(value = "/five-last")
+    public ResponseEntity<Collection<Student>> getLastFiveStudents() {
+        return ResponseEntity.ok(studentService.getLastFiveStudents());
     }
 }
